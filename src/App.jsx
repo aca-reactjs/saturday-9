@@ -1,12 +1,17 @@
 import { useState, createRef, useRef, useEffect, useMemo } from "react";
+import Screen from "./components/Screen";
 
-let outerRef = null;
-
-const listStyles = { listStyle: "none", display: "flex", gap: "1rem" };
+const listStyles = {
+  listStyle: "none",
+  display: "flex",
+  width: 200,
+  height: 200,
+  zIndex: 1000,
+};
 
 const listItemStyles = {
   width: 200,
-  maxWidth: 200,
+  minWidth: 200,
   border: "1px solid red",
   aspectRatio: "1/1",
   borderRadius: "5px",
@@ -15,31 +20,61 @@ const listItemStyles = {
   alignItems: "center",
 };
 
+const buttonStyles = {
+  background: "white",
+  padding: "5px",
+  border: "none",
+  outline: "none",
+  boxShadow: "0 0 0 1px black",
+};
+
+const items = ["one", "two", "three"];
+
+const ButtonClickType = {
+  next: "next",
+  prev: "prev",
+};
+
 function App() {
-  const inputRef = useRef(null);
-  const anotherRef = useRef(null);
-  const [state, setState] = useState(false);
+  const [activeItemPosition, setActiveItemPosition] = useState(0);
 
-  useEffect(() => {
-    if (inputRef.current) {
-      console.log("inputRef.current", inputRef.current);
-      inputRef.current.focus();
+  const handleButtonClick = (type) => () => {
+    if (type === ButtonClickType.next) {
+      setActiveItemPosition((prev) => prev + 1);
+
+      return;
     }
-  }, []);
 
-  useEffect(() => {
-    console.log(`🐞 / App / anotherRef`, anotherRef);
-  }, [state]);
+    setActiveItemPosition((prev) => prev - 1);
+  };
+
+  const translateLength = activeItemPosition * 200;
+  console.log(`🐞 / App / translateLength`, translateLength);
 
   return (
-    <div className="App" style={{ padding: "1rem" }}>
-      <ul style={listStyles}>
-        {["one", "two", "three"].map((el) => (
-          <li style={listItemStyles} key={el}>
-            <span>{el}</span>
-          </li>
-        ))}
-      </ul>
+    <div>
+      <Screen
+        style={{
+          width: 200,
+          height: 200,
+          overflow: "hidden",
+          borderRadius: "5px",
+          zIndex: 0,
+        }}
+      >
+        <ul
+          style={{
+            ...listStyles,
+            transform: `translateX(-${translateLength}px)`,
+          }}
+        >
+          {items.map((el) => (
+            <li style={listItemStyles} key={el}>
+              <span>{el}</span>
+            </li>
+          ))}
+        </ul>
+      </Screen>
       <div style={{ width: 200 }}>
         <div
           className="buttonWrapper"
@@ -50,8 +85,18 @@ function App() {
             alignItems: "center",
           }}
         >
-          <button>Prev</button>
-          <button>Next</button>
+          <button
+            onClick={handleButtonClick(ButtonClickType.prev)}
+            style={buttonStyles}
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={handleButtonClick(ButtonClickType.next)}
+            style={buttonStyles}
+          >
+            {">"}
+          </button>
         </div>
       </div>
     </div>
