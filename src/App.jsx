@@ -35,21 +35,31 @@ const ButtonClickType = {
   prev: "prev",
 };
 
+useRef = (initialValue) => ({ current: initialValue });
+
 function App() {
   const [activeItemPosition, setActiveItemPosition] = useState(0);
+  const [disabledButton, setDisabledButton] = useState(null);
 
   const handleButtonClick = (type) => () => {
     if (type === ButtonClickType.next) {
-      setActiveItemPosition((prev) => prev + 1);
+      if (activeItemPosition <= 1) {
+        setActiveItemPosition((prev) => prev + 1);
+      } else {
+        setDisabledButton(ButtonClickType.next);
+      }
 
       return;
     }
 
-    setActiveItemPosition((prev) => prev - 1);
+    if (activeItemPosition >= 1) {
+      setActiveItemPosition((prev) => prev - 1);
+    } else {
+      setDisabledButton(ButtonClickType.prev);
+    }
   };
 
   const translateLength = activeItemPosition * 200;
-  console.log(`🐞 / App / translateLength`, translateLength);
 
   return (
     <div>
@@ -66,6 +76,7 @@ function App() {
           style={{
             ...listStyles,
             transform: `translateX(-${translateLength}px)`,
+            transition: "all 1000ms linear",
           }}
         >
           {items.map((el) => (
@@ -87,6 +98,7 @@ function App() {
         >
           <button
             onClick={handleButtonClick(ButtonClickType.prev)}
+            disabled={disabledButton === ButtonClickType.prev}
             style={buttonStyles}
           >
             {"<"}
@@ -94,6 +106,7 @@ function App() {
           <button
             onClick={handleButtonClick(ButtonClickType.next)}
             style={buttonStyles}
+            disabled={disabledButton === ButtonClickType.next}
           >
             {">"}
           </button>
